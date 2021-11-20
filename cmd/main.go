@@ -5,14 +5,18 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"proj/internal/repository"
+	"proj/internal/service"
 	"proj/internal/transport/http"
 	"proj/pkg/server"
 	"syscall"
 )
 
 func main() {
-	r := http.NewRouter()
-	s := server.NewServer("8080", r)
+	repos := repository.Init()
+	services := service.Init(repos)
+	r := http.NewRouter(*services)
+	s := server.NewServer("8080", r.Init())
 
 	go func() {
 		if err := s.Start(); err != nil {

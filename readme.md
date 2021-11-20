@@ -2,13 +2,12 @@ Golang REST API
 
 Сервис для хранения заметок пользователей
 
-GET /users
-GET /users/{id}
+GET /users/{userId}
 POST /users
-DELETE /users/{id}
+DELETE /users/{userId}
 
-GET /users/{id}/notes
-GET /users/{id}/notes/{id}
-POST /users/{id}/notes
-PUT /users/{id}/notes/{id}
-DELETE /users/{id}/notes/{id}
+GET /users/{userId}/notes
+GET /users/{userId}/notes/{noteId}
+POST /users/{userId}/notes
+PATCH /users/{userId}/notes/{noteId}
+DELETE /users/{userId}/notes/{noteId}

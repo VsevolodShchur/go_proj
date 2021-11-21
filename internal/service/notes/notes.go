@@ -9,19 +9,11 @@ import (
 
 var ErrUserNote = errors.New("user does not have this note")
 
-type NotesRepo interface {
-	CreateNote(note *domain.Note) error
-	GetNote(ID string) (*domain.Note, error)
-	UpdateNote(ID string, text string) error
-	DeleteNote(ID string) error
-	ListUserNotes(userID string) ([]*domain.Note, error)
-}
-
 type NotesService struct {
-	repo NotesRepo
+	repo domain.NotesRepo
 }
 
-func NewNotesService(repo NotesRepo) *NotesService {
+func NewNotesService(repo domain.NotesRepo) *NotesService {
 	return &NotesService{
 		repo: repo,
 	}

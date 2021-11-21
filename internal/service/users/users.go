@@ -6,22 +6,16 @@ import (
 	"github.com/google/uuid"
 )
 
-type UsersRepo interface {
-	CreateUser(user *domain.User) error
-	GetUser(ID string) (*domain.User, error)
-	DeleteUser(ID string) error
-}
-
 type NotesRepo interface {
 	ListUserNotes(userID string) ([]*domain.Note, error)
 }
 
 type UserService struct {
-	repo      UsersRepo
+	repo      domain.UsersRepo
 	notesRepo NotesRepo
 }
 
-func NewUserService(repo UsersRepo, notesRepo NotesRepo) *UserService {
+func NewUserService(repo domain.UsersRepo, notesRepo NotesRepo) *UserService {
 	return &UserService{
 		repo:      repo,
 		notesRepo: notesRepo,

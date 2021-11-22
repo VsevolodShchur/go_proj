@@ -1,7 +1,6 @@
 package http
 
 import (
-	"proj/internal/service"
 	ctxKey "proj/pkg/context_key"
 
 	"github.com/go-chi/chi/v5"
@@ -9,12 +8,12 @@ import (
 )
 
 type Router struct {
-	services service.Services
+	handlers *Handlers
 }
 
-func NewRouter(s service.Services) *Router {
+func NewRouter(handlers *Handlers) *Router {
 	return &Router{
-		services: s,
+		handlers: handlers,
 	}
 }
 
@@ -26,13 +25,12 @@ func (r *Router) Init() *chi.Mux {
 }
 
 func (r *Router) initUserRouter() chi.Router {
-	handler := NewUsersHandler(r.services.UserService)
 	router := chi.NewRouter()
-	router.Post("/", handler.createUser)
+	router.Post("/", r.handlers.usersHandler.createUser)
 	router.Route("/{userID}", func(subRouter chi.Router) {
 		subRouter.Use(ctxKey.URLParamCtx("userID", userIDCtxKey))
-		subRouter.Get("/", handler.getUser)
-		subRouter.Delete("/", handler.deleteUser)
+		subRouter.Get("/", r.handlers.usersHandler.getUser)
+		subRouter.Delete("/", r.handlers.usersHandler.deleteUser)
 		subRouter.Mount("/notes", r.initNotesRouter())
 	})
 
@@ -40,15 +38,14 @@ func (r *Router) initUserRouter() chi.Router {
 }
 
 func (r *Router) initNotesRouter() chi.Router {
-	handler := NewNotesHandler(r.services.NotesService)
 	router := chi.NewRouter()
-	router.Get("/", handler.listNotes)
-	router.Post("/", handler.createNote)
+	router.Get("/", r.handlers.notesHandler.listNotes)
+	router.Post("/", r.handlers.notesHandler.createNote)
 	router.Route("/{noteID}", func(subRouter chi.Router) {
 		subRouter.Use(ctxKey.URLParamCtx("noteID", noteIDCtxKey))
-		subRouter.Get("/", handler.getNote)
-		subRouter.Patch("/", handler.updateNote)
-		subRouter.Delete("/", handler.deleteNote)
+		subRouter.Get("/", r.handlers.notesHandler.getNote)
+		subRouter.Patch("/", r.handlers.notesHandler.updateNote)
+		subRouter.Delete("/", r.handlers.notesHandler.deleteNote)
 	})
 	return router
 }

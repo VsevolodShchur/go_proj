@@ -3,7 +3,7 @@ package notes
 import (
 	"errors"
 	"proj/internal/domain"
-	mock_notes "proj/internal/service/notes/mocks"
+	mock_domain "proj/internal/domain/mocks"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -11,15 +11,19 @@ import (
 )
 
 type notesServiceMocks struct {
-	repo *mock_notes.MockNotesRepo
+	repo *mock_domain.MockNotesRepo
 }
 
-var validUUID = "asd"
+var (
+	userUUID = "43b6408d-e195-42e5-87ff-fe97c24ea080"
+	noteUUID = "c37c0de8-a784-4ec1-8ca9-598535661c2c"
+)
 
-func newNotesServiceMocks(t *testing.T, setBehavior func(*notesServiceMocks)) *notesServiceMocks {
+func newNotesServiceMocks(t *testing.T,
+	setBehavior func(*notesServiceMocks)) *notesServiceMocks {
 	c := gomock.NewController(t)
 	mocks := &notesServiceMocks{
-		repo: mock_notes.NewMockNotesRepo(c),
+		repo: mock_domain.NewMockNotesRepo(c),
 	}
 	setBehavior(mocks)
 	return mocks
@@ -36,55 +40,70 @@ func TestNotesService_UpdateNote(t *testing.T) {
 	}{
 		{
 			name:        "ok",
-			inputUserID: validUUID,
-			inputNoteID: validUUID,
+			inputUserID: userUUID,
+			inputNoteID: noteUUID,
 			inputText:   "text",
 			mocksBehavior: func(nsm *notesServiceMocks) {
-				nsm.repo.EXPECT().GetNote(validUUID).Return(&domain.Note{
-					ID:     validUUID,
-					UserID: validUUID,
-					Text:   "asd",
-				}, nil)
-				nsm.repo.EXPECT().UpdateNote(validUUID, "text").Return(nil)
+				nsm.repo.EXPECT().
+					GetNote(noteUUID).
+					Return(
+						&domain.Note{
+							ID:     noteUUID,
+							UserID: userUUID,
+							Text:   "asd",
+						}, nil)
+				nsm.repo.EXPECT().
+					UpdateNote(noteUUID, "text").
+					Return(nil)
 			},
 			expectedError: nil,
 		},
 		{
 			name:        "when GetNote fails",
-			inputUserID: validUUID,
-			inputNoteID: validUUID,
+			inputUserID: userUUID,
+			inputNoteID: noteUUID,
 			inputText:   "text",
 			mocksBehavior: func(nsm *notesServiceMocks) {
-				nsm.repo.EXPECT().GetNote(validUUID).Return(nil, errors.New("GetNote error"))
+				nsm.repo.EXPECT().
+					GetNote(noteUUID).
+					Return(nil, errors.New("GetNote error"))
 			},
 			expectedError: errors.New("GetNote error"),
 		},
 		{
 			name:        "when UpdateNote fails",
-			inputUserID: validUUID,
-			inputNoteID: validUUID,
+			inputUserID: userUUID,
+			inputNoteID: noteUUID,
 			inputText:   "text",
 			mocksBehavior: func(nsm *notesServiceMocks) {
-				nsm.repo.EXPECT().GetNote(validUUID).Return(&domain.Note{
-					ID:     validUUID,
-					UserID: validUUID,
-					Text:   "asd",
-				}, nil)
-				nsm.repo.EXPECT().UpdateNote(validUUID, "text").Return(errors.New("UpdateNote error"))
+				nsm.repo.EXPECT().
+					GetNote(noteUUID).
+					Return(
+						&domain.Note{
+							ID:     noteUUID,
+							UserID: userUUID,
+							Text:   "asd",
+						}, nil)
+				nsm.repo.EXPECT().
+					UpdateNote(noteUUID, "text").
+					Return(errors.New("UpdateNote error"))
 			},
 			expectedError: errors.New("UpdateNote error"),
 		},
 		{
 			name:        "user does not have this note",
-			inputUserID: validUUID,
-			inputNoteID: validUUID,
+			inputUserID: userUUID,
+			inputNoteID: noteUUID,
 			inputText:   "text",
 			mocksBehavior: func(nsm *notesServiceMocks) {
-				nsm.repo.EXPECT().GetNote(validUUID).Return(&domain.Note{
-					ID:     validUUID,
-					UserID: "other uuid",
-					Text:   "asd",
-				}, nil)
+				nsm.repo.EXPECT().
+					GetNote(noteUUID).
+					Return(
+						&domain.Note{
+							ID:     noteUUID,
+							UserID: "437e7406-76c7-4eff-af14-e5f42ed7c793",
+							Text:   "asd",
+						}, nil)
 			},
 			expectedError: ErrUserNote,
 		},
@@ -95,7 +114,8 @@ func TestNotesService_UpdateNote(t *testing.T) {
 			mocks := newNotesServiceMocks(t, tc.mocksBehavior)
 			s := NewNotesService(mocks.repo)
 
-			err := s.UpdateNote(tc.inputUserID, tc.inputNoteID, tc.inputText)
+			err := s.UpdateNote(tc.inputUserID, tc.inputNoteID,
+				tc.inputText)
 
 			assert.Equal(t, tc.expectedError, err)
 		})

@@ -6,16 +6,17 @@ import (
 	"github.com/google/uuid"
 )
 
-type NotesRepo interface {
+type notesRepo interface {
 	ListUserNotes(userID string) ([]*domain.Note, error)
+	DeleteUserNotes(userID string) error
 }
 
 type UserService struct {
 	repo      domain.UsersRepo
-	notesRepo NotesRepo
+	notesRepo notesRepo
 }
 
-func NewUserService(repo domain.UsersRepo, notesRepo NotesRepo) *UserService {
+func NewUserService(repo domain.UsersRepo, notesRepo notesRepo) *UserService {
 	return &UserService{
 		repo:      repo,
 		notesRepo: notesRepo,
@@ -48,5 +49,8 @@ func (s *UserService) GetUser(ID string) (*domain.User, error) {
 }
 
 func (s *UserService) DeleteUser(ID string) error {
+	if err := s.notesRepo.DeleteUserNotes(ID); err != nil {
+		return err
+	}
 	return s.repo.DeleteUser(ID)
 }

@@ -3,8 +3,7 @@ package users
 import (
 	"errors"
 	"proj/internal/domain"
-	mock_notes "proj/internal/service/notes/mocks"
-	mock_users "proj/internal/service/users/mocks"
+	mock_domain "proj/internal/domain/mocks"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -14,15 +13,15 @@ import (
 var validUUID = "asd"
 
 type usersServiceMocks struct {
-	repo      *mock_users.MockUsersRepo
-	notesRepo *mock_notes.MockNotesRepo
+	repo      *mock_domain.MockUsersRepo
+	notesRepo *mock_domain.MockNotesRepo
 }
 
 func newUsersServiceMocks(t *testing.T, setBehavior func(*usersServiceMocks)) *usersServiceMocks {
 	c := gomock.NewController(t)
 	mocks := &usersServiceMocks{
-		repo:      mock_users.NewMockUsersRepo(c),
-		notesRepo: mock_notes.NewMockNotesRepo(c),
+		repo:      mock_domain.NewMockUsersRepo(c),
+		notesRepo: mock_domain.NewMockNotesRepo(c),
 	}
 	setBehavior(mocks)
 	return mocks

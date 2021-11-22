@@ -11,7 +11,7 @@ import (
 
 type NotesService interface {
 	CreateNote(text string, userID string) (*domain.Note, error)
-	GetNote(ID string) (*domain.Note, error)
+	GetNote(userID string, noteID string) (*domain.Note, error)
 	UpdateNote(userID string, noteID string, text string) error
 	DeleteNote(userID string, noteID string) error
 	ListUserNotes(userID string) ([]*domain.Note, error)
@@ -47,8 +47,9 @@ func (h *NotesHandler) createNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *NotesHandler) getNote(w http.ResponseWriter, r *http.Request) {
+	userID := ctxkey.GetFormCtx(r, userIDCtxKey)
 	noteID := ctxkey.GetFormCtx(r, noteIDCtxKey)
-	note, err := h.service.GetNote(noteID)
+	note, err := h.service.GetNote(userID, noteID)
 	if err != nil {
 		render.Status(r, resovleStatus(err))
 		render.Respond(w, r, resp.ErrorResponse{Error: err.Error()})

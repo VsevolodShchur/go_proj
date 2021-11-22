@@ -31,8 +31,11 @@ func (s *NotesService) CreateNote(text string, userID string) (*domain.Note, err
 	return note, nil
 }
 
-func (s *NotesService) GetNote(ID string) (*domain.Note, error) {
-	return s.repo.GetNote(ID)
+func (s *NotesService) GetNote(userID string, noteID string) (*domain.Note, error) {
+	if err := s.checkUserNote(userID, noteID); err != nil {
+		return nil, err
+	}
+	return s.repo.GetNote(noteID)
 }
 
 func (s *NotesService) checkUserNote(userID string, noteID string) error {

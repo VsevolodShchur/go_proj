@@ -15,7 +15,9 @@ import (
 func main() {
 	repos := repository.Init()
 	services := service.Init(repos)
-	r := http.NewRouter(*services)
+	handlers := http.NewHandlers(services)
+	r := http.NewRouter(handlers)
+
 	s := server.NewServer("8080", r.Init())
 
 	go func() {

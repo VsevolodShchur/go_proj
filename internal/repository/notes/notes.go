@@ -55,3 +55,12 @@ func (r *NotesRepo) ListUserNotes(userID string) ([]*domain.Note, error) {
 	}
 	return notes, nil
 }
+
+func (r *NotesRepo) DeleteUserNotes(userID string) error {
+	for k, note := range r.notes {
+		if note.UserID == userID {
+			delete(r.notes, k)
+		}
+	}
+	return nil
+}

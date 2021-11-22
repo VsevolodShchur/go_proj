@@ -6,6 +6,7 @@ type NotesRepo interface {
 	UpdateNote(ID string, text string) error
 	DeleteNote(ID string) error
 	ListUserNotes(userID string) ([]*Note, error)
+	DeleteUserNotes(userID string) error
 }
 
 type Note struct {
